@@ -1,11 +1,8 @@
-﻿using Core.Entities;
+﻿using Core.DTO_s;
+using Core.Entities;
 using Core.Interfaces;
+
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructre.Data
 {
@@ -27,9 +24,23 @@ namespace Infrastructre.Data
             return getOne;
         }
 
-        public async Task<IReadOnlyList<Product>> GetProductsAsync()
+        public async Task<IReadOnlyList<ProductDto>> GetProductsAsync()
         {
-         return await  _Context.products.ToListAsync();
+            return await(from p in _Context.products
+                     join pt in _Context.productTypes on p.ProductBrandId equals pt.Id
+                     join pb in _Context.productBrands on p.ProductTypeId equals pb.Id
+                     select new ProductDto
+                     {
+                         ProductName = p.Name,
+                         Price= p.Price,
+                         Description = p.Description,
+                         PictureUrl = p.PictureUrl,
+                         ProductBrandName = pb.Name,
+                         ProductTypeName= pt.Name,
+
+
+                     }).ToListAsync();
+           // return await  _Context.products.Include(x=>x.productType).Include(x=>x.productBrand).ToListAsync();
           
         }
     }
