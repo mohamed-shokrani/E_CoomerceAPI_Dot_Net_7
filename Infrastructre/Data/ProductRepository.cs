@@ -16,7 +16,9 @@ namespace Infrastructre.Data
 
         public async Task<Product> GetProductByIdAsync(int id)
         {
-         var getOne= await  _Context.products.FindAsync(id);
+            var getOne = await _Context.products.Include(x => x.productBrand)
+                                                .Include(p => p.productType)
+                                                .FirstOrDefaultAsync();//FindAsync(id);
             if (getOne is null)
             {
                 return new Product();
@@ -40,7 +42,6 @@ namespace Infrastructre.Data
 
 
                      }).ToListAsync();
-           // return await  _Context.products.Include(x=>x.productType).Include(x=>x.productBrand).ToListAsync();
           
         }
     }

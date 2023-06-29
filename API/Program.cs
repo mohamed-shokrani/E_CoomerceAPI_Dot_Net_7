@@ -22,6 +22,8 @@ namespace API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            builder.Services.AddScoped(typeof (IGenericRepository<>), typeof (GenericRepository<>));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

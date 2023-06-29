@@ -11,13 +11,13 @@ namespace API.Controllers;
 public class ProductsController : ControllerBase 
 {
     private readonly IProductRepository _productRepository ;
-    private readonly AppDbContext _Context;//_productRepository;
+    private readonly IGenericRepository<Product> _Data ;//_productRepository;
 
 
-    public ProductsController(IProductRepository productRepository, AppDbContext context)
+    public ProductsController(IProductRepository productRepository, IGenericRepository<Product> data)
     {
         _productRepository = productRepository;
-        _Context = context;
+        _Data = data;
     }
     [HttpGet]
     public async Task<ActionResult <IReadOnlyList<Product>>> GetAll()
@@ -29,6 +29,6 @@ public class ProductsController : ControllerBase
     public async Task<ActionResult< Product>> GetSingle(int id)
     {
       
-        return Ok(await _productRepository.GetProductByIdAsync(id));
+        return Ok(await _Data.GetByIdAsync(id));
     }
 }
