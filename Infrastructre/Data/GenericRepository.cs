@@ -1,11 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructre.Data;
 
@@ -20,12 +15,30 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
     public async Task<T> GetByIdAsync(int id)
     {
-       var gt=await _Context.Set<T>().FindAsync(id);
+        var gt = await _Context.Set<T>().FindAsync(id);
         return gt;
+    }
+
+    public async Task<T> GetEntityWithSpec(ISpecification<T> spec)
+    {
+      return await ApplySpecification(spec).FirstOrDefaultAsync();
+    }
+
+    public async Task<List<T>> ListAsync(ISpecification<T> spec)
+    {
+       return await ApplySpecification(spec).ToListAsync(); 
     }
 
     public async Task<IReadOnlyList<T>> ListAllAsync()
     {
         return await _Context.Set<T>().ToListAsync();
     }
+    private IQueryable<T> ApplySpecification(ISpecification<T> spec) 
+    {
+        // So T gets Replaced with let's say product and is goona be converted into a querable 
+       
+        return SpecificationEvaluator<T>.GetQuery(_Context.Set<T>().AsQueryable(),spec);
+    }
+
+
 }

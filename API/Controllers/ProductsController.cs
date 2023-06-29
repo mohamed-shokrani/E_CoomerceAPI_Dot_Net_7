@@ -1,8 +1,8 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
-using Infrastructre.Data;
+using Infrastructre.Data.Specification;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace API.Controllers;
 
@@ -20,15 +20,16 @@ public class ProductsController : ControllerBase
         _Data = data;
     }
     [HttpGet]
-    public async Task<ActionResult <IReadOnlyList<Product>>> GetAll()
+    public async Task<ActionResult< IReadOnlyList<Product>>> GetProducts()
     {
-        var all = await _productRepository.GetProductsAsync();
-        return Ok(all);
+        var spec = new ProductsWithBrandsAndTypes();
+
+        return Ok(await _Data.ListAsync(spec));
     }
     [HttpGet("{id}")]
     public async Task<ActionResult< Product>> GetSingle(int id)
     {
       
-        return Ok(await _Data.GetByIdAsync(id));
+        return Ok(await  _Data.GetByIdAsync(id));
     }
 }
