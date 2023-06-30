@@ -9,4 +9,10 @@ public class ProductsWithBrandsAndTypes : Specification<Product>
         AddInclude(x => x.productType);
         AddInclude(x => x.productBrand);
     }
+    public ProductsWithBrandsAndTypes(int id) 
+        :base( x=>x.Id ==id)
+    {
+        AddInclude(x => x.productType);
+        AddInclude(x => x.productBrand);
+    }
 }
