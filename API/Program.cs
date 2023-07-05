@@ -1,11 +1,7 @@
-
-using API.Helper;
-using AutoMapper;
-using Core.Interfaces;
+using API.Middlerware;
 using Infrastructre.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System.Text.Json.Serialization;
+using API.Extensions;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,28 +9,24 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString
     ("DefaultConnectionString")));
 // Add services to the container.
-
-builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddAutoMapper(typeof(MappingProfiles));
+builder.Services.AddApplicationServices();
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionMiddleware>();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
+}
+// so when the request comes into our api server and we do not have an endpoint 
+// that matches that particular requset then we gonna hit this middler and gonna redirect to error controller
+app.UseStatusCodePagesWithReExecute("/errors/{0}");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAuthorization();
-
+app.UseSwaggerDocumentaion();
 
 app.MapControllers();
 using var scope = app.Services.CreateScope();
@@ -50,13 +42,12 @@ using var scope = app.Services.CreateScope();
     }
     catch (Exception ex)
     {
-
         var logger = loggerFactory.CreateLogger<Program>();
         logger.LogError(ex.Message);
     }
 }
 
-
+app.UseRouting();
 app.Run();
 
 

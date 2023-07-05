@@ -6,7 +6,7 @@ namespace API.Helper
 {
     public class ProductUrlResolve : IValueResolver<Product, ProductDto, string>
     {
-        private readonly IConfiguration Config;// { get; }
+        private readonly IConfiguration Config;
 
         public ProductUrlResolve(IConfiguration config)
         {
