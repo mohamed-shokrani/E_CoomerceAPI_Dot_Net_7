@@ -10,16 +10,22 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(
     ("DefaultConnectionString")));
 // Add services to the container.
 builder.Services.AddApplicationServices();
+builder.Services.AddCors();
 
 var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();
-
+app.UseCors(x => x.AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials()
+    .AllowAnyOrigin()
+    .WithOrigins("https://localhost:4200"));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
 
 }
+
 // so when the request comes into our api server and we do not have an endpoint 
 // that matches that particular requset then we gonna hit this middler and gonna redirect to error controller
 app.UseStatusCodePagesWithReExecute("/errors/{0}");
@@ -27,7 +33,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAuthorization();
 app.UseSwaggerDocumentaion();
-
 app.MapControllers();
 using var scope = app.Services.CreateScope();
 {

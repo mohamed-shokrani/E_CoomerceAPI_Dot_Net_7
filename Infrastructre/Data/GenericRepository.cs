@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
+using Core.Specification;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructre.Data;
@@ -33,6 +34,10 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
         return await _Context.Set<T>().ToListAsync();
     }
+    public async Task<int> CountAsync(ISpecification<T> spec)
+    {
+        return await ApplySpecification(spec).CountAsync();
+    }
     private IQueryable<T> ApplySpecification(ISpecification<T> spec) 
     {
         // So T gets Replaced with let's say product and is goona be converted into a querable 
@@ -40,5 +45,5 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         return SpecificationEvaluator<T>.GetQuery(_Context.Set<T>().AsQueryable(),spec);
     }
 
-
+  
 }
