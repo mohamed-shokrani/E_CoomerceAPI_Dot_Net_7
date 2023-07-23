@@ -13,18 +13,24 @@ namespace API.Controllers;
 
 public class ProductsController : BaseApiController 
 {
-    private readonly IProductRepository _productRepository ;
-    private readonly IGenericRepository<Product> _Data ;//_productRepository;
+    private readonly IProductRepository _ProductRepository;
+    private readonly IGenericRepository<Product> _Data ;
+    private readonly IGenericRepository<ProductBrand> _Brand ;
+    private readonly IGenericRepository<ProductType> _Types;//_productRepository;
+
+    //_productRepository;_
     private readonly IMapper _Mapper;
-    public ProductsController(IMapper mapper, IProductRepository productRepository, IGenericRepository<Product> data)
+    public ProductsController(IGenericRepository<ProductType> types ,IMapper mapper, IProductRepository productRepository, IGenericRepository<Product> data, IGenericRepository<ProductBrand> brand)
     {
         _Mapper = mapper;
-        _productRepository = productRepository;
+        _ProductRepository = productRepository;
         _Data = data;
+        _Brand = brand;
+        _Types = types;
     }
 
     [HttpGet]
-    public async Task<ActionResult< Pagination<ProductDto>>> GetProducts([FromQuery]ProductSpecParams productSpecParams)
+    public async Task<ActionResult<Pagination<ProductDto>>> GetProducts([FromQuery] ProductSpecParams productSpecParams)
     {
 
         var spec = new ProductsWithBrandsAndTypes(productSpecParams);
@@ -37,8 +43,25 @@ public class ProductsController : BaseApiController
 
         var data = _Mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductDto>>(products);
 
-     return Ok( new Pagination<ProductDto>(productSpecParams.indexPage,productSpecParams.pageSize
-                                 , totalItems, data));
+        return Ok(new Pagination<ProductDto>(productSpecParams.indexPage, productSpecParams.pageSize
+                                    , totalItems, data));
+    }
+    [HttpGet("ProductBrand")]
+    public async Task< ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
+    {
+        var brands = await _Brand.ListAllAsync();
+
+
+        return Ok(brands); 
+    }
+
+    [HttpGet("ProductTypes")]
+    public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductTypes()
+    {
+        var brands = await _Types.ListAllAsync();
+
+
+        return Ok(brands);
     }
     [HttpGet("{id}")]
     [ProducesResponseType(200)]
