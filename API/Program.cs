@@ -2,7 +2,7 @@ using API.Middlerware;
 using Infrastructre.Data;
 using Microsoft.EntityFrameworkCore;
 using API.Extensions;
-
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(
@@ -11,7 +11,11 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(
 // Add services to the container.
 builder.Services.AddApplicationServices();
 builder.Services.AddCors();
-
+builder.Services.AddSingleton<IConnectionMultiplexer>(x =>
+{
+    var config = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis"),true);
+    return ConnectionMultiplexer.Connect(config);
+});
 var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(x => x.AllowAnyHeader()

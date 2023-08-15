@@ -1,5 +1,6 @@
 ﻿using API.Errors;
 using API.Helper;
+using Core.Entities;
 using Core.Interfaces;
 using Infrastructre.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ public static class ApplicationServiceExtension
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        //.AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
         services.AddControllers();//.AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
         services.Configure<ApiBehaviorOptions>(options =>
@@ -33,6 +35,7 @@ public static class ApplicationServiceExtension
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddAutoMapper(typeof(MappingProfiles));
+        services.AddScoped<IBasketRepository, BasketRepository>();
         return services;
 
     }
